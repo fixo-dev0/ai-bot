@@ -13,7 +13,6 @@
       font-family: 'Poppins', 'Inter', -apple-system, sans-serif;
     }
 
-    /* ============ ANIME BACKGROUND ============ */
     body {
       background: linear-gradient(135deg, #2b1055 0%, #7597de 50%, #f093fb 100%);
       background-size: 400% 400%;
@@ -32,7 +31,6 @@
       50% { background-position: 100% 50%; }
     }
 
-    /* ============ FLOATING PARTICLES ============ */
     .particles {
       position: fixed;
       top: 0;
@@ -53,19 +51,12 @@
     }
 
     @keyframes floatUp {
-      0% {
-        transform: translateY(100vh) rotate(0deg) scale(0.5);
-        opacity: 0;
-      }
+      0% { transform: translateY(100vh) rotate(0deg) scale(0.5); opacity: 0; }
       10% { opacity: 0.9; }
       90% { opacity: 0.9; }
-      100% {
-        transform: translateY(-100px) rotate(360deg) scale(1.2);
-        opacity: 0;
-      }
+      100% { transform: translateY(-100px) rotate(360deg) scale(1.2); opacity: 0; }
     }
 
-    /* ============ GLOWING ORBS ============ */
     .orb {
       position: fixed;
       border-radius: 50%;
@@ -85,7 +76,6 @@
       50% { transform: translate(30px, -30px) scale(1.1); }
     }
 
-    /* ============ MAIN CONTAINER ============ */
     .container {
       position: relative;
       z-index: 2;
@@ -110,7 +100,6 @@
       to { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    /* Shine overlay */
     .container::before {
       content: '';
       position: absolute;
@@ -118,12 +107,7 @@
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(255, 182, 255, 0.08),
-        transparent
-      );
+      background: linear-gradient(90deg, transparent, rgba(255, 182, 255, 0.08), transparent);
       animation: shine 8s infinite;
       pointer-events: none;
     }
@@ -133,7 +117,6 @@
       50%, 100% { left: 100%; }
     }
 
-    /* ============ ANIME GIRL AVATAR ============ */
     .avatar-wrap {
       display: flex;
       justify-content: center;
@@ -159,7 +142,6 @@
       50% { transform: translateY(-10px); }
     }
 
-    /* Rotating ring around avatar */
     .avatar::before {
       content: '';
       position: absolute;
@@ -168,18 +150,13 @@
       right: -8px;
       bottom: -8px;
       border-radius: 50%;
-      background: conic-gradient(
-        from 0deg,
-        #ff6bcb, #667eea, #f093fb, #ff6bcb
-      );
+      background: conic-gradient(from 0deg, #ff6bcb, #667eea, #f093fb, #ff6bcb);
       z-index: -1;
       animation: spinRing 3s linear infinite;
       filter: blur(4px);
     }
 
-    @keyframes spinRing {
-      to { transform: rotate(360deg); }
-    }
+    @keyframes spinRing { to { transform: rotate(360deg); } }
 
     .avatar svg {
       width: 100%;
@@ -189,7 +166,6 @@
       display: block;
     }
 
-    /* Status dot */
     .status-dot-avatar {
       position: absolute;
       bottom: 12px;
@@ -214,7 +190,6 @@
       50% { transform: scale(1.2); }
     }
 
-    /* Sparkles around avatar */
     .sparkle {
       position: absolute;
       color: #ffd700;
@@ -233,7 +208,6 @@
       50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
     }
 
-    /* ============ HEADER ============ */
     .header {
       text-align: center;
       margin-bottom: 24px;
@@ -259,7 +233,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* ============ CONNECTION BADGE ============ */
     .conn-badge {
       display: flex;
       align-items: center;
@@ -302,7 +275,6 @@
       50% { opacity: 0.5; transform: scale(1.3); }
     }
 
-    /* ============ TABS ============ */
     .tabs {
       display: flex;
       background: rgba(255, 255, 255, 0.05);
@@ -338,17 +310,13 @@
     }
 
     .tab-content { display: none; }
-    .tab-content.active {
-      display: block;
-      animation: fadeIn 0.4s ease;
-    }
+    .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
 
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ============ FORM ============ */
     .form-group { margin-bottom: 18px; }
 
     label {
@@ -379,9 +347,7 @@
     input:focus, select:focus {
       border-color: #ff6bcb;
       background: rgba(255, 107, 203, 0.08);
-      box-shadow:
-        0 0 0 4px rgba(255, 107, 203, 0.15),
-        0 0 30px rgba(255, 107, 203, 0.3);
+      box-shadow: 0 0 0 4px rgba(255, 107, 203, 0.15), 0 0 30px rgba(255, 107, 203, 0.3);
       transform: translateY(-1px);
     }
 
@@ -395,11 +361,7 @@
       padding-right: 44px;
     }
 
-    select option {
-      background: #1a1033;
-      color: #fff;
-      padding: 10px;
-    }
+    select option { background: #1a1033; color: #fff; padding: 10px; }
 
     .hint {
       font-size: 11.5px;
@@ -409,7 +371,6 @@
       font-weight: 400;
     }
 
-    /* ============ BUTTON ============ */
     .btn {
       width: 100%;
       padding: 16px;
@@ -459,9 +420,7 @@
 
     .btn:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow:
-        0 12px 30px rgba(255, 107, 203, 0.5),
-        0 0 40px rgba(102, 126, 234, 0.4);
+      box-shadow: 0 12px 30px rgba(255, 107, 203, 0.5), 0 0 40px rgba(102, 126, 234, 0.4);
     }
 
     .btn:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -478,7 +437,19 @@
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ============ PAIR CODE BOX ============ */
+    /* Reset button */
+    .btn-reset {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+      animation: none !important;
+      margin-top: 12px;
+      font-size: 13px;
+      padding: 13px;
+    }
+
+    .btn-reset:hover:not(:disabled) {
+      box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5) !important;
+    }
+
     .code-box {
       background: linear-gradient(135deg, rgba(255, 107, 203, 0.15) 0%, rgba(102, 126, 234, 0.15) 100%);
       border: 2px solid rgba(255, 107, 203, 0.4);
@@ -567,7 +538,6 @@
       box-shadow: 0 0 20px rgba(255, 107, 203, 0.4);
     }
 
-    /* ============ STEPS BOX ============ */
     .steps {
       background: rgba(255, 255, 255, 0.04);
       border: 1px solid rgba(255, 182, 255, 0.15);
@@ -600,7 +570,6 @@
       border: 1px solid rgba(255, 107, 203, 0.3);
     }
 
-    /* ============ TOAST ============ */
     .toast {
       position: fixed;
       top: 24px;
@@ -634,7 +603,6 @@
       box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
     }
 
-    /* ============ FOOTER ============ */
     .footer {
       text-align: center;
       color: #8a80a8;
@@ -655,7 +623,6 @@
       50% { transform: scale(1.3); }
     }
 
-    /* ============ RESPONSIVE ============ */
     @media (max-width: 480px) {
       .container { padding: 28px 22px; border-radius: 24px; }
       h1 { font-size: 24px; }
@@ -671,23 +638,19 @@
   </style>
 </head>
 <body>
-  <!-- Glowing orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
 
-  <!-- Floating particles -->
   <div class="particles" id="particles"></div>
 
   <div class="container">
-    <!-- Anime Girl Avatar -->
     <div class="avatar-wrap">
       <span class="sparkle sparkle-1">✨</span>
       <span class="sparkle sparkle-2">💫</span>
       <span class="sparkle sparkle-3">✨</span>
       <span class="sparkle sparkle-4">⭐</span>
       <div class="avatar">
-        <!-- Anime Girl SVG -->
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <radialGradient id="bgGrad" cx="50%" cy="50%">
@@ -714,71 +677,47 @@
             </radialGradient>
           </defs>
 
-          <!-- Background circle -->
           <circle cx="100" cy="100" r="100" fill="url(#bgGrad)"/>
-
-          <!-- Back hair -->
           <ellipse cx="100" cy="115" rx="62" ry="72" fill="url(#hairGrad)"/>
-
-          <!-- Neck -->
           <rect x="88" y="120" width="24" height="20" rx="6" fill="#ffc4a8"/>
-
-          <!-- Face -->
           <ellipse cx="100" cy="98" rx="42" ry="46" fill="url(#skinGrad)"/>
-
-          <!-- Blush -->
           <ellipse cx="72" cy="108" rx="8" ry="5" fill="#ff9ddb" opacity="0.6"/>
           <ellipse cx="128" cy="108" rx="8" ry="5" fill="#ff9ddb" opacity="0.6"/>
-
-          <!-- Front hair - bangs -->
           <path d="M 58 78 Q 60 45 100 40 Q 140 45 142 78 Q 135 60 120 55 Q 118 75 100 72 Q 82 75 80 55 Q 65 60 58 78 Z" fill="url(#hairGrad)"/>
-
-          <!-- Hair strands -->
           <path d="M 58 78 Q 55 95 60 115 Q 62 100 65 85 Z" fill="url(#hairGrad)"/>
           <path d="M 142 78 Q 145 95 140 115 Q 138 100 135 85 Z" fill="url(#hairGrad)"/>
-
-          <!-- Hair shine -->
           <path d="M 70 55 Q 90 48 110 55 Q 100 60 90 58 Q 80 60 70 55 Z" fill="url(#hairShine)" opacity="0.7"/>
 
-          <!-- Left eye -->
           <ellipse cx="82" cy="100" rx="10" ry="12" fill="#fff"/>
           <ellipse cx="82" cy="100" rx="8" ry="10" fill="url(#eyeGrad)"/>
           <ellipse cx="82" cy="100" rx="3.5" ry="5" fill="#0f172a"/>
           <circle cx="84" cy="96" r="2.5" fill="#fff"/>
           <circle cx="80" cy="102" r="1.2" fill="#fff" opacity="0.8"/>
-          <!-- Eyelash -->
           <path d="M 71 92 Q 82 86 93 92" stroke="#1a1033" stroke-width="2.5" fill="none" stroke-linecap="round"/>
           <path d="M 71 92 L 68 90" stroke="#1a1033" stroke-width="2.5" stroke-linecap="round"/>
           <path d="M 93 92 L 96 90" stroke="#1a1033" stroke-width="2.5" stroke-linecap="round"/>
 
-          <!-- Right eye -->
           <ellipse cx="118" cy="100" rx="10" ry="12" fill="#fff"/>
           <ellipse cx="118" cy="100" rx="8" ry="10" fill="url(#eyeGrad)"/>
           <ellipse cx="118" cy="100" rx="3.5" ry="5" fill="#0f172a"/>
           <circle cx="120" cy="96" r="2.5" fill="#fff"/>
           <circle cx="116" cy="102" r="1.2" fill="#fff" opacity="0.8"/>
-          <!-- Eyelash -->
           <path d="M 107 92 Q 118 86 129 92" stroke="#1a1033" stroke-width="2.5" fill="none" stroke-linecap="round"/>
           <path d="M 107 92 L 104 90" stroke="#1a1033" stroke-width="2.5" stroke-linecap="round"/>
           <path d="M 129 92 L 132 90" stroke="#1a1033" stroke-width="2.5" stroke-linecap="round"/>
 
-          <!-- Eyebrows -->
           <path d="M 74 84 Q 82 80 90 84" stroke="#c084fc" stroke-width="2" fill="none" stroke-linecap="round"/>
           <path d="M 110 84 Q 118 80 126 84" stroke="#c084fc" stroke-width="2" fill="none" stroke-linecap="round"/>
 
-          <!-- Nose -->
           <path d="M 100 108 L 98 112 L 102 112" stroke="#e8a890" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
 
-          <!-- Smile -->
           <path d="M 92 120 Q 100 126 108 120" stroke="#d97a9b" stroke-width="2" fill="none" stroke-linecap="round"/>
           <path d="M 96 122 Q 100 124 104 122" fill="#ff6bcb" opacity="0.7"/>
 
-          <!-- Hair accessory - star -->
           <g transform="translate(135, 60)">
             <path d="M 0 -8 L 2.5 -2.5 L 8 0 L 2.5 2.5 L 0 8 L -2.5 2.5 L -8 0 L -2.5 -2.5 Z" fill="#ffd700" stroke="#ff9ddb" stroke-width="1"/>
           </g>
 
-          <!-- Hair accessory - heart -->
           <g transform="translate(60, 70)">
             <path d="M 0 -3 Q -5 -8 -8 -3 Q -8 2 0 8 Q 8 2 8 -3 Q 5 -8 0 -3 Z" fill="#ff6bcb" stroke="#fff" stroke-width="0.8"/>
           </g>
@@ -787,25 +726,21 @@
       <div class="status-dot-avatar offline" id="avatarStatus"></div>
     </div>
 
-    <!-- Header -->
     <div class="header">
       <h1>Fixo dev ✨</h1>
       <p class="subtitle">Your Personal AI Companion 💗</p>
     </div>
 
-    <!-- Connection Status -->
     <div id="connBadge" class="conn-badge conn-disconnected">
       <span class="conn-dot"></span>
       <span id="connText">Checking connection...</span>
     </div>
 
-    <!-- Tabs -->
     <div class="tabs">
       <button class="tab active" data-tab="pair">🔗 Pair Device</button>
       <button class="tab" data-tab="settings">⚙️ Settings</button>
     </div>
 
-    <!-- TAB 1: PAIR DEVICE -->
     <div class="tab-content active" id="tab-pair">
       <div class="form-group">
         <label>📱 WhatsApp Number to Pair</label>
@@ -834,9 +769,10 @@
           <li>Enter the code shown above</li>
         </ol>
       </div>
+
+      <button class="btn btn-reset" id="resetBtn">🔄 Reset Session</button>
     </div>
 
-    <!-- TAB 2: SETTINGS -->
     <div class="tab-content" id="tab-settings">
       <div class="form-group">
         <label>📱 Your WhatsApp Number</label>
@@ -908,11 +844,9 @@
       setTimeout(() => p.remove(), 20000);
     }
 
-    // Create initial particles
     for (let i = 0; i < 12; i++) {
       setTimeout(createParticle, i * 400);
     }
-    // Continuously create particles
     setInterval(createParticle, 1500);
 
     // ============ Elements ============
@@ -927,6 +861,7 @@
     const copyBtn = document.getElementById('copyBtn');
     const stepsBox = document.getElementById('stepsBox');
     const saveBtn = document.getElementById('saveBtn');
+    const resetBtn = document.getElementById('resetBtn');
 
     // ============ Tabs ============
     document.querySelectorAll('.tab').forEach(tab => {
@@ -947,7 +882,7 @@
       if (type === 'info') toast.classList.add('info');
       const icons = { success: '✅', error: '❌', info: 'ℹ️' };
       toast.innerHTML = `<span>${icons[type] || '✅'}</span><span>${msg}</span>`;
-      toastTimeout = setTimeout(() => toast.className = 'toast', 3500);
+      toastTimeout = setTimeout(() => toast.className = 'toast', 4000);
     }
 
     // ============ Helpers ============
@@ -1046,6 +981,33 @@
       }
     });
 
+    // ============ Reset Session ============
+    resetBtn.addEventListener('click', async () => {
+      if (!confirm('Reset session? This will clear the current WhatsApp pairing.')) return;
+
+      resetBtn.disabled = true;
+      const original = resetBtn.innerHTML;
+      resetBtn.innerHTML = '⏳ Resetting...';
+
+      try {
+        const res = await fetch('/api/reset', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(data.message || 'Session reset!', 'success');
+          codeBox.classList.remove('show');
+          stepsBox.style.display = 'none';
+          setTimeout(checkStatus, 5000);
+        } else {
+          showToast(data.error || 'Reset failed', 'error');
+        }
+      } catch (e) {
+        showToast('Network error', 'error');
+      } finally {
+        resetBtn.disabled = false;
+        resetBtn.innerHTML = original;
+      }
+    });
+
     // ============ Load User Settings ============
     const userFields = {
       userName: document.getElementById('userName'),
@@ -1128,4 +1090,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
