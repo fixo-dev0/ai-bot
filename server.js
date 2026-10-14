@@ -8,7 +8,8 @@ const {
   connectToWhatsApp,
   getSocket,
   requestPairingCode,
-  getStatus
+  getStatus,
+  resetSession
 } = require('./src/whatsapp');
 const { initScheduler } = require('./src/scheduler');
 const { User } = require('./src/database');
@@ -24,7 +25,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// View engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
@@ -37,7 +37,7 @@ app.get('/api/status', (req, res) => {
   res.json(getStatus());
 });
 
-// Request a pairing code for a phone number
+// Request a pairing code
 app.post('/api/pair', async (req, res) => {
   try {
     const { phoneNumber } = req.body;
@@ -56,6 +56,23 @@ app.post('/api/pair', async (req, res) => {
   } catch (error) {
     console.error('Pair error:', error.message);
     res.status(400).json({ error: error.message });
+  }
+});
+
+// Reset session (clear auth + reconnect)
+app.post('/api/reset', async (req, res) => {
+  try {
+    const success = await resetSession();
+    if (success) {
+      res.json({
+        success: true,
+        message: 'Session reset. Please wait a few seconds and try pairing again.'
+      });
+    } else {
+      res.status(500).json({ error: 'Failed to reset session' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -87,7 +104,7 @@ app.post('/api/user', async (req, res) => {
       user = await User.create({
         whatsappNumber: cleaned,
         userName: userName || 'Sayang',
-        aiName: aiName || 'Fixo dev',                  // ← Updated
+        aiName: aiName || 'Fixo dev',
         userGender: userGender || 'male',
         aiGender: aiGender || 'female',
         language: language || 'both'
@@ -112,7 +129,7 @@ app.get('/api/user/:whatsappNumber', async (req, res) => {
   }
 });
 
-// Get all users (admin)
+// Get all users
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.find({}).sort({ createdAt: -1 });
@@ -122,7 +139,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Toggle bot active status for a user
+// Toggle bot active status
 app.post('/api/user/:whatsappNumber/toggle', async (req, res) => {
   try {
     const cleaned = String(req.params.whatsappNumber).replace(/\D/g, '');
@@ -140,12 +157,10 @@ app.post('/api/user/:whatsappNumber/toggle', async (req, res) => {
 // MAIN ROUTES
 // ============================================================
 
-// Static dashboard (public/index.html)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Server-rendered setup page (EJS)
 app.get('/setup', async (req, res) => {
   try {
     const number = req.query.number;
@@ -167,7 +182,6 @@ app.get('/setup', async (req, res) => {
   }
 });
 
-// Handle setup form submission
 app.post('/setup', async (req, res) => {
   try {
     const { whatsappNumber, userName, aiName, userGender, aiGender, language } = req.body;
@@ -186,7 +200,7 @@ app.post('/setup', async (req, res) => {
       user = await User.create({
         whatsappNumber: cleaned,
         userName: userName || 'Sayang',
-        aiName: aiName || 'Fixo dev',                  // ← Updated
+        aiName: aiName || 'Fixo dev',
         userGender: userGender || 'male',
         aiGender: aiGender || 'female',
         language: language || 'both'
@@ -210,23 +224,18 @@ app.post('/setup', async (req, res) => {
 // ============================================================
 // START SERVER
 // ============================================================
-
 async function start() {
   try {
-    // Connect to MongoDB
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✅ MongoDB connected');
 
-    // Start Express server
     app.listen(PORT, () => {
       console.log(`🌐 Fixo dev server running on port ${PORT}`);
     });
 
-    // Connect WhatsApp
     const sock = await connectToWhatsApp();
     console.log('💗 Fixo dev WhatsApp bot initialized');
 
-    // Initialize scheduler (good morning etc.)
     initScheduler(sock);
 
   } catch (error) {
