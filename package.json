@@ -1,8 +1,12 @@
+
 {
   "name": "whatsapp-ai-girlfriend-bot",
   "version": "1.0.0",
-  "description": "WhatsApp AI Girlfriend Bot with Sinhala/English support",
+  "description": "WhatsApp AI Companion Bot (Fixo dev) with Sinhala/English support",
   "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
@@ -20,5 +24,8 @@
     "body-parser": "^2.3.0",
     "cors": "^2.8.6",
     "ejs": "^7.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
   }
 }
