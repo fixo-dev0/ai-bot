@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fixo dev - AI Companion</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', 'Inter', -apple-system, sans-serif;
+    }
+
+    /* ============ ANIME BACKGROUND ============ */
+    body {
+      background: linear-gradient(135deg, #2b1055 0%, #7597de 50%, #f093fb 100%);
+      background-size: 400% 400%;
+      animation: gradientShift 20s ease infinite;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* ============ FLOATING PARTICLES ============ */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      font-size: 20px;
+      animation: floatUp linear infinite;
+      opacity: 0.7;
+      filter: drop-shadow(0 0 8px rgba(255, 182, 255, 0.8));
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) rotate(0deg) scale(0.5);
+        opacity: 0;
+      }
+      10% { opacity: 0.9; }
+      90% { opacity: 0.9; }
+      100% {
+        transform: translateY(-100px) rotate(360deg) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    /* ============ GLOWING ORBS ============ */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 0;
+      animation: orbFloat 15s ease-in-out infinite;
+    }
+
+    .orb-1 { width: 300px; height: 300px; background: #ff6bcb; top: -100px; left: -100px; }
+    .orb-2 { width: 400px; height: 400px; background: #667eea; bottom: -150px; right: -100px; animation-delay: -5s; }
+    .orb-3 { width: 250px; height: 250px; background: #f093fb; top: 40%; left: 60%; animation-delay: -10s; }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(30px, -30px) scale(1.1); }
+    }
+
+    /* ============ MAIN CONTAINER ============ */
+    .container {
+      position: relative;
+      z-index: 2;
+      background: rgba(20, 15, 40, 0.85);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-radius: 30px;
+      border: 1px solid rgba(255, 182, 255, 0.3);
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 0 80px rgba(240, 147, 251, 0.3);
+      max-width: 560px;
+      width: 100%;
+      padding: 40px;
+      animation: fadeInUp 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      overflow: hidden;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(50px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Shine overlay */
+    .container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 182, 255, 0.08),
+        transparent
+      );
+      animation: shine 8s infinite;
+      pointer-events: none;
+    }
+
+    @keyframes shine {
+      0% { left: -100%; }
+      50%, 100% { left: 100%; }
+    }
+
+    /* ============ ANIME GIRL AVATAR ============ */
+    .avatar-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .avatar {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff6bcb 0%, #667eea 100%);
+      padding: 4px;
+      position: relative;
+      animation: avatarFloat 4s ease-in-out infinite;
+      box-shadow:
+        0 0 40px rgba(255, 107, 203, 0.6),
+        0 0 80px rgba(102, 126, 234, 0.4);
+    }
+
+    @keyframes avatarFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* Rotating ring around avatar */
+    .avatar::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        #ff6bcb, #667eea, #f093fb, #ff6bcb
+      );
+      z-index: -1;
+      animation: spinRing 3s linear infinite;
+      filter: blur(4px);
+    }
+
+    @keyframes spinRing {
+      to { transform: rotate(360deg); }
+    }
+
+    .avatar svg {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #1a1033;
+      display: block;
+    }
+
+    /* Status dot */
+    .status-dot-avatar {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 3px solid rgba(20, 15, 40, 0.9);
+      background: #10b981;
+      box-shadow: 0 0 12px #10b981;
+      animation: pulseDot 2s infinite;
+      z-index: 5;
+    }
+
+    .status-dot-avatar.offline {
+      background: #f59e0b;
+      box-shadow: 0 0 12px #f59e0b;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    /* Sparkles around avatar */
+    .sparkle {
+      position: absolute;
+      color: #ffd700;
+      font-size: 20px;
+      animation: sparkleAnim 2s ease-in-out infinite;
+      text-shadow: 0 0 10px #ffd700;
+    }
+
+    .sparkle-1 { top: 10px; left: 30px; animation-delay: 0s; }
+    .sparkle-2 { top: 30px; right: 20px; animation-delay: 0.5s; }
+    .sparkle-3 { bottom: 20px; left: 20px; animation-delay: 1s; }
+    .sparkle-4 { bottom: 40px; right: 30px; animation-delay: 1.5s; }
+
+    @keyframes sparkleAnim {
+      0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+      50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+    }
+
+    /* ============ HEADER ============ */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    h1 {
+      color: #fff;
+      font-size: 30px;
+      font-weight: 900;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ff6bcb 0%, #f093fb 50%, #667eea 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(255, 107, 203, 0.5));
+    }
+
+    .subtitle {
+      color: #b8b0d8;
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
+    /* ============ CONNECTION BADGE ============ */
+    .conn-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .conn-connected {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-color: rgba(16, 185, 129, 0.4);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+    }
+
+    .conn-disconnected {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.4);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
+    }
+
+    .conn-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 2s infinite;
+      box-shadow: 0 0 8px currentColor;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+
+    /* ============ TABS ============ */
+    .tabs {
+      display: flex;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 182, 255, 0.15);
+      border-radius: 16px;
+      padding: 5px;
+      margin-bottom: 26px;
+      position: relative;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      color: #b8b0d8;
+      border: none;
+      background: transparent;
+      font-family: inherit;
+      position: relative;
+      z-index: 1;
+    }
+
+    .tab.active {
+      color: #fff;
+      background: linear-gradient(135deg, #ff6bcb 0%, #667eea 100%);
+      box-shadow: 0 8px 20px rgba(255, 107, 203, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ============ FORM ============ */
+    .form-group { margin-bottom: 18px; }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #e0d8ff;
+      font-size: 13px;
+      letter-spacing: 0.3px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 14px 16px;
+      border: 2px solid rgba(255, 182, 255, 0.15);
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 500;
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      font-family: inherit;
+      transition: all 0.25s;
+      outline: none;
+    }
+
+    input::placeholder { color: #7a7096; }
+
+    input:focus, select:focus {
+      border-color: #ff6bcb;
+      background: rgba(255, 107, 203, 0.08);
+      box-shadow:
+        0 0 0 4px rgba(255, 107, 203, 0.15),
+        0 0 30px rgba(255, 107, 203, 0.3);
+      transform: translateY(-1px);
+    }
+
+    select {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff6bcb' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      background-size: 18px;
+      padding-right: 44px;
+    }
+
+    select option {
+      background: #1a1033;
+      color: #fff;
+      padding: 10px;
+    }
+
+    .hint {
+      font-size: 11.5px;
+      color: #9a90b8;
+      margin-top: 6px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    /* ============ BUTTON ============ */
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #ff6bcb 0%, #667eea 100%);
+      background-size: 200% 200%;
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+      position: relative;
+      overflow: hidden;
+      letter-spacing: 0.5px;
+      animation: gradientMove 3s ease infinite;
+    }
+
+    @keyframes gradientMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover:not(:disabled)::before {
+      width: 400px;
+      height: 400px;
+    }
+
+    .btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow:
+        0 12px 30px rgba(255, 107, 203, 0.5),
+        0 0 40px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .btn.loading::after {
+      content: '';
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ============ PAIR CODE BOX ============ */
+    .code-box {
+      background: linear-gradient(135deg, rgba(255, 107, 203, 0.15) 0%, rgba(102, 126, 234, 0.15) 100%);
+      border: 2px solid rgba(255, 107, 203, 0.4);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      color: white;
+      margin: 20px 0;
+      display: none;
+      animation: codePop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .code-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 107, 203, 0.15), transparent 70%);
+      animation: glowPulse 2s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes codePop {
+      from { opacity: 0; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .code-box.show { display: block; }
+
+    .code-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #ff9ddb;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+
+    .code-value {
+      font-size: 40px;
+      font-weight: 900;
+      letter-spacing: 8px;
+      font-family: 'SF Mono', Monaco, monospace;
+      margin: 14px 0;
+      background: linear-gradient(135deg, #ff6bcb 0%, #f093fb 50%, #667eea 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      filter: drop-shadow(0 0 20px rgba(255, 107, 203, 0.6));
+      animation: codeShimmer 3s ease infinite;
+      background-size: 200% 200%;
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes codeShimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .copy-btn {
+      background: rgba(255, 107, 203, 0.2);
+      color: #fff;
+      border: 1px solid rgba(255, 107, 203, 0.5);
+      padding: 10px 22px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.25s;
+      position: relative;
+      z-index: 1;
+      letter-spacing: 0.5px;
+    }
+
+    .copy-btn:hover {
+      background: rgba(255, 107, 203, 0.35);
+      transform: scale(1.05);
+      box-shadow: 0 0 20px rgba(255, 107, 203, 0.4);
+    }
+
+    /* ============ STEPS BOX ============ */
+    .steps {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 182, 255, 0.15);
+      border-radius: 16px;
+      padding: 18px 22px;
+      margin-top: 16px;
+      font-size: 13px;
+      color: #c8c0e0;
+      line-height: 1.8;
+    }
+
+    .steps strong {
+      display: block;
+      color: #ff9ddb;
+      margin-bottom: 10px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .steps ol { padding-left: 22px; }
+    .steps li { margin-bottom: 6px; }
+
+    .steps code {
+      background: rgba(255, 107, 203, 0.15);
+      padding: 2px 10px;
+      border-radius: 6px;
+      color: #ff9ddb;
+      font-weight: 700;
+      font-size: 12px;
+      border: 1px solid rgba(255, 107, 203, 0.3);
+    }
+
+    /* ============ TOAST ============ */
+    .toast {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      padding: 16px 24px;
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border-radius: 16px;
+      font-weight: 600;
+      font-size: 14px;
+      transform: translateX(500px);
+      transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      box-shadow: 0 12px 30px rgba(16, 185, 129, 0.5);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 380px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .toast.show { transform: translateX(0); }
+
+    .toast.error {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5);
+    }
+
+    .toast.info {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      box-shadow: 0 12px 30px rgba(59, 130, 246, 0.5);
+    }
+
+    /* ============ FOOTER ============ */
+    .footer {
+      text-align: center;
+      color: #8a80a8;
+      font-size: 12px;
+      margin-top: 22px;
+      line-height: 1.7;
+      font-weight: 500;
+    }
+
+    .footer .heart {
+      display: inline-block;
+      animation: heartBeat 1.2s ease-in-out infinite;
+      color: #ff6bcb;
+    }
+
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.3); }
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 480px) {
+      .container { padding: 28px 22px; border-radius: 24px; }
+      h1 { font-size: 24px; }
+      .avatar { width: 130px; height: 130px; }
+      .code-value { font-size: 30px; letter-spacing: 6px; }
+      .toast {
+        top: 16px; right: 16px; left: 16px;
+        max-width: none;
+        transform: translateY(-120px);
+      }
+      .toast.show { transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Glowing orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Floating particles -->
+  <div class="particles" id="particles"></div>
+
+  <div class="container">
+    <!-- Anime Girl Avatar -->
+    <div class="avatar-wrap">
+      <span class="sparkle sparkle-1">✨</span>
+      <span class="sparkle sparkle-2">💫</span>
+      <span class="sparkle sparkle-3">✨</span>
+      <span class="sparkle sparkle-4">⭐</span>
+      <div class="avatar">
+        <!-- Anime Girl SVG -->
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="bgGrad" cx="50%" cy="50%">
+              <stop offset="0%" stop-color="#3d1e5c"/>
+              <stop offset="100%" stop-color="#1a1033"/>
+            </radialGradient>
+            <linearGradient id="hairGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ff6bcb"/>
+              <stop offset="50%" stop-color="#c084fc"/>
+              <stop offset="100%" stop-color="#667eea"/>
+            </linearGradient>
+            <linearGradient id="hairShine" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#ffe0f5"/>
+              <stop offset="100%" stop-color="#ff9ddb"/>
+            </linearGradient>
+            <linearGradient id="skinGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#ffe0d0"/>
+              <stop offset="100%" stop-color="#ffc4a8"/>
+            </linearGradient>
+            <radialGradient id="eyeGrad" cx="50%" cy="50%">
+              <stop offset="0%" stop-color="#a5f3fc"/>
+              <stop offset="50%" stop-color="#667eea"/>
+              <stop offset="100%" stop-color="#4c1d95"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Background circle -->
+          <circle cx="100" cy="100" r="100" fill="url(#bgGrad)"/>
+
+          <!-- Back hair -->
+          <ellipse cx="100" cy="115" rx="62" ry="72" fill="url(#hairGrad)"/>
+
+          <!-- Neck -->
+          <rect x="88" y="120" width="24" height="20" rx="6" fill="#ffc4a8"/>
+
+          <!-- Face -->
+          <ellipse cx="100" cy="98" rx="42" ry="46" fill="url(#skinGrad)"/>
+
+          <!-- Blush -->
+          <ellipse cx="72" cy="108" rx="8" ry="5" fill="#ff9ddb" opacity="0.6"/>
+          <ellipse cx="128" cy="108" rx="8" ry="5" fill="#ff9ddb" opacity="0.6"/>
+
+          <!-- Front hair - bangs -->
+          <path d="M 58 78 Q 60 45 100 40 Q 140 45 142 78 Q 135 60 120 55 Q 118 75 100 72 Q 82 75 80 55 Q 65 60 58 78 Z" fill="url(#hairGrad)"/>
+
+          <!-- Hair strands -->
+          <path d="M 58 78 Q 55 95 60 115 Q 62 100 65 85 Z" fill="url(#hairGrad)"/>
+          <path d="M 142 78 Q 145 95 140 115 Q 138 100 135 85 Z" fill="url(#hairGrad)"/>
+
+          <!-- Hair shine -->
+          <path d="M 70 55 Q 90 48 110 55 Q 100 60 90 58 Q 80 60 70 55 Z" fill="url(#hairShine)" opacity="0.7"/>
+
+          <!-- Left eye -->
+          <ellipse cx="82" cy="100" rx="10" ry="12" fill="#fff"/>
+          <ellipse cx="82" cy="100" rx="8" ry="10" fill="url(#eyeGrad)"/>
+          <ellipse cx="82" cy="100" rx="3.5" ry="5" fill="#0f172a"/>
+          <circle cx="84" cy="96" r="2.5" fill="#fff"/>
+          <circle cx="80" cy="102" r="1.2" fill="#fff" opacity="0.8"/>
+          <!-- Eyelash -->
+          <path d="M 71 92 Q 82 86 93 92" stroke="#1a1033" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M 71 92 L 68 90" stroke="#1a1033" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M 93 92 L 96 90" stroke="#1a1033" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- Right eye -->
+          <ellipse cx="118" cy="100" rx="10" ry="12" fill="#fff"/>
+          <ellipse cx="118" cy="100" rx="8" ry="10" fill="url(#eyeGrad)"/>
+          <ellipse cx="118" cy="100" rx="3.5" ry="5" fill="#0f172a"/>
+          <circle cx="120" cy="96" r="2.5" fill="#fff"/>
+          <circle cx="116" cy="102" r="1.2" fill="#fff" opacity="0.8"/>
+          <!-- Eyelash -->
+          <path d="M 107 92 Q 118 86 129 92" stroke="#1a1033" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M 107 92 L 104 90" stroke="#1a1033" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M 129 92 L 132 90" stroke="#1a1033" stroke-width="2.5" stroke-linecap="round"/>
+
+          <!-- Eyebrows -->
+          <path d="M 74 84 Q 82 80 90 84" stroke="#c084fc" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M 110 84 Q 118 80 126 84" stroke="#c084fc" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+          <!-- Nose -->
+          <path d="M 100 108 L 98 112 L 102 112" stroke="#e8a890" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+          <!-- Smile -->
+          <path d="M 92 120 Q 100 126 108 120" stroke="#d97a9b" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M 96 122 Q 100 124 104 122" fill="#ff6bcb" opacity="0.7"/>
+
+          <!-- Hair accessory - star -->
+          <g transform="translate(135, 60)">
+            <path d="M 0 -8 L 2.5 -2.5 L 8 0 L 2.5 2.5 L 0 8 L -2.5 2.5 L -8 0 L -2.5 -2.5 Z" fill="#ffd700" stroke="#ff9ddb" stroke-width="1"/>
+          </g>
+
+          <!-- Hair accessory - heart -->
+          <g transform="translate(60, 70)">
+            <path d="M 0 -3 Q -5 -8 -8 -3 Q -8 2 0 8 Q 8 2 8 -3 Q 5 -8 0 -3 Z" fill="#ff6bcb" stroke="#fff" stroke-width="0.8"/>
+          </g>
+        </svg>
+      </div>
+      <div class="status-dot-avatar offline" id="avatarStatus"></div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <h1>Fixo dev ✨</h1>
+      <p class="subtitle">Your Personal AI Companion 💗</p>
+    </div>
+
+    <!-- Connection Status -->
+    <div id="connBadge" class="conn-badge conn-disconnected">
+      <span class="conn-dot"></span>
+      <span id="connText">Checking connection...</span>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab active" data-tab="pair">🔗 Pair Device</button>
+      <button class="tab" data-tab="settings">⚙️ Settings</button>
+    </div>
+
+    <!-- TAB 1: PAIR DEVICE -->
+    <div class="tab-content active" id="tab-pair">
+      <div class="form-group">
+        <label>📱 WhatsApp Number to Pair</label>
+        <input type="tel" id="pairNumber" placeholder="94771234567" autocomplete="off">
+        <p class="hint">
+          Enter the number you want to link Fixo dev to (country code, no + sign).
+          <br>⚠️ Use a dedicated number, not your personal one.
+        </p>
+      </div>
+
+      <button class="btn" id="pairBtn">🔑 Get Pairing Code</button>
+
+      <div class="code-box" id="codeBox">
+        <div class="code-label">✨ Your Pairing Code ✨</div>
+        <div class="code-value" id="codeValue">----</div>
+        <button class="copy-btn" id="copyBtn">📋 Copy Code</button>
+      </div>
+
+      <div class="steps" id="stepsBox" style="display: none;">
+        <strong>📲 How to pair with Fixo dev:</strong>
+        <ol>
+          <li>Open WhatsApp on your phone</li>
+          <li>Tap <strong>Settings</strong> → <strong>Linked Devices</strong></li>
+          <li>Tap <strong>Link a Device</strong></li>
+          <li>Tap <strong>Link with phone number instead</strong></li>
+          <li>Enter the code shown above</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- TAB 2: SETTINGS -->
+    <div class="tab-content" id="tab-settings">
+      <div class="form-group">
+        <label>📱 Your WhatsApp Number</label>
+        <input type="tel" id="whatsappNumber" placeholder="94771234567" autocomplete="off">
+        <p class="hint">This is the number you'll chat with Fixo dev from</p>
+      </div>
+
+      <div class="form-group">
+        <label>💑 Your Name</label>
+        <input type="text" id="userName" placeholder="Sayang" value="Sayang" autocomplete="off">
+        <p class="hint">The name Fixo dev will call you</p>
+      </div>
+
+      <div class="form-group">
+        <label>🤖 AI Companion's Name</label>
+        <input type="text" id="aiName" placeholder="Fixo dev" value="Fixo dev" autocomplete="off">
+      </div>
+
+      <div class="form-group">
+        <label>👤 Your Gender</label>
+        <select id="userGender">
+          <option value="male">Male 👦</option>
+          <option value="female">Female 👧</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>💗 AI Companion's Gender</label>
+        <select id="aiGender">
+          <option value="female">Female 👧 (Girlfriend)</option>
+          <option value="male">Male 👦 (Boyfriend)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>🗣️ Preferred Language</label>
+        <select id="language">
+          <option value="both">Sinhala + English 🌐</option>
+          <option value="sinhala">Sinhala Only 🇱🇰</option>
+          <option value="english">English Only 🇬🇧</option>
+        </select>
+      </div>
+
+      <button class="btn" id="saveBtn">💾 Save Settings</button>
+    </div>
+
+    <div class="footer">
+      <p>💬 Once paired, send <code style="background:rgba(255,107,203,0.15);padding:2px 10px;border-radius:6px;color:#ff9ddb;font-weight:700;border:1px solid rgba(255,107,203,0.3);">!register</code> to activate</p>
+      <p style="margin-top: 8px;">Made with <span class="heart">💗</span> by Fixo dev</p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ============ FLOATING PARTICLES ============
+    const particleEmojis = ['💗', '✨', '💖', '⭐', '🌸', '💕', '💫', '🌺'];
+    const particleContainer = document.getElementById('particles');
+
+    function createParticle() {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.textContent = particleEmojis[Math.floor(Math.random() * particleEmojis.length)];
+      p.style.left = Math.random() * 100 + '%';
+      p.style.animationDuration = (Math.random() * 10 + 10) + 's';
+      p.style.fontSize = (Math.random() * 15 + 15) + 'px';
+      p.style.animationDelay = Math.random() * 5 + 's';
+      particleContainer.appendChild(p);
+      setTimeout(() => p.remove(), 20000);
+    }
+
+    // Create initial particles
+    for (let i = 0; i < 12; i++) {
+      setTimeout(createParticle, i * 400);
+    }
+    // Continuously create particles
+    setInterval(createParticle, 1500);
+
+    // ============ Elements ============
+    const toast = document.getElementById('toast');
+    const connBadge = document.getElementById('connBadge');
+    const connText = document.getElementById('connText');
+    const avatarStatus = document.getElementById('avatarStatus');
+    const pairBtn = document.getElementById('pairBtn');
+    const pairNumber = document.getElementById('pairNumber');
+    const codeBox = document.getElementById('codeBox');
+    const codeValue = document.getElementById('codeValue');
+    const copyBtn = document.getElementById('copyBtn');
+    const stepsBox = document.getElementById('stepsBox');
+    const saveBtn = document.getElementById('saveBtn');
+
+    // ============ Tabs ============
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ============ Toast ============
+    let toastTimeout = null;
+    function showToast(msg, type = 'success') {
+      clearTimeout(toastTimeout);
+      toast.className = 'toast show';
+      if (type === 'error') toast.classList.add('error');
+      if (type === 'info') toast.classList.add('info');
+      const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+      toast.innerHTML = `<span>${icons[type] || '✅'}</span><span>${msg}</span>`;
+      toastTimeout = setTimeout(() => toast.className = 'toast', 3500);
+    }
+
+    // ============ Helpers ============
+    const cleanNumber = n => String(n || '').replace(/\D/g, '');
+    const validNumber = n => {
+      const c = cleanNumber(n);
+      return c.length >= 10 && c.length <= 15;
+    };
+
+    // ============ Connection Status ============
+    async function checkStatus() {
+      try {
+        const res = await fetch('/api/status');
+        const data = await res.json();
+        if (data.connected) {
+          connBadge.className = 'conn-badge conn-connected';
+          connText.textContent = '✨ Fixo dev is online ✨';
+          avatarStatus.classList.remove('offline');
+          pairBtn.disabled = true;
+          pairNumber.disabled = true;
+        } else if (data.registered) {
+          connBadge.className = 'conn-badge conn-disconnected';
+          connText.textContent = 'Paired but offline — reconnecting...';
+          avatarStatus.classList.add('offline');
+        } else {
+          connBadge.className = 'conn-badge conn-disconnected';
+          connText.textContent = 'Not paired — enter a number to pair';
+          avatarStatus.classList.add('offline');
+        }
+      } catch (e) {
+        connBadge.className = 'conn-badge conn-disconnected';
+        connText.textContent = 'Unable to check status';
+        avatarStatus.classList.add('offline');
+      }
+    }
+
+    checkStatus();
+    setInterval(checkStatus, 8000);
+
+    // ============ Pair ============
+    pairBtn.addEventListener('click', async () => {
+      const num = cleanNumber(pairNumber.value);
+      if (!num) {
+        showToast('Please enter a WhatsApp number', 'error');
+        pairNumber.focus();
+        return;
+      }
+      if (!validNumber(num)) {
+        showToast('Invalid number format', 'error');
+        return;
+      }
+
+      pairBtn.disabled = true;
+      pairBtn.classList.add('loading');
+      const original = pairBtn.innerHTML;
+      pairBtn.innerHTML = 'Generating code...';
+
+      try {
+        const res = await fetch('/api/pair', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phoneNumber: num })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          codeValue.textContent = data.code;
+          codeBox.classList.add('show');
+          stepsBox.style.display = 'block';
+          showToast('Pairing code generated! 💗', 'success');
+        } else {
+          showToast(data.error || 'Failed to generate code', 'error');
+        }
+      } catch (err) {
+        showToast('Network error. Try again.', 'error');
+      } finally {
+        pairBtn.disabled = false;
+        pairBtn.classList.remove('loading');
+        pairBtn.innerHTML = original;
+      }
+    });
+
+    pairNumber.addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/[^\d]/g, '');
+    });
+
+    // ============ Copy Code ============
+    copyBtn.addEventListener('click', async () => {
+      const code = codeValue.textContent;
+      if (!code || code === '----') return;
+      try {
+        await navigator.clipboard.writeText(code);
+        showToast('Code copied! ✨', 'success');
+      } catch (e) {
+        showToast('Copy failed. Select manually.', 'error');
+      }
+    });
+
+    // ============ Load User Settings ============
+    const userFields = {
+      userName: document.getElementById('userName'),
+      aiName: document.getElementById('aiName'),
+      userGender: document.getElementById('userGender'),
+      aiGender: document.getElementById('aiGender'),
+      language: document.getElementById('language')
+    };
+    const whatsappNumberInput = document.getElementById('whatsappNumber');
+
+    async function loadUserSettings(num) {
+      try {
+        const res = await fetch(`/api/user/${num}`);
+        if (res.ok) {
+          const u = await res.json();
+          userFields.userName.value = u.userName || 'Sayang';
+          userFields.aiName.value = u.aiName || 'Fixo dev';
+          userFields.userGender.value = u.userGender || 'male';
+          userFields.aiGender.value = u.aiGender || 'female';
+          userFields.language.value = u.language || 'both';
+          showToast('Existing settings loaded 💗', 'info');
+        }
+      } catch (e) { /* ignore */ }
+    }
+
+    whatsappNumberInput.addEventListener('blur', e => {
+      const num = cleanNumber(e.target.value);
+      if (num && validNumber(num)) {
+        e.target.value = num;
+        loadUserSettings(num);
+      }
+    });
+
+    whatsappNumberInput.addEventListener('input', e => {
+      e.target.value = e.target.value.replace(/[^\d]/g, '');
+    });
+
+    // ============ Save Settings ============
+    saveBtn.addEventListener('click', async () => {
+      const num = cleanNumber(whatsappNumberInput.value);
+      if (!validNumber(num)) {
+        showToast('Please enter a valid WhatsApp number', 'error');
+        whatsappNumberInput.focus();
+        return;
+      }
+
+      const payload = {
+        whatsappNumber: num,
+        userName: userFields.userName.value.trim() || 'Sayang',
+        aiName: userFields.aiName.value.trim() || 'Fixo dev',
+        userGender: userFields.userGender.value,
+        aiGender: userFields.aiGender.value,
+        language: userFields.language.value
+      };
+
+      saveBtn.disabled = true;
+      saveBtn.classList.add('loading');
+      const original = saveBtn.innerHTML;
+      saveBtn.innerHTML = 'Saving...';
+
+      try {
+        const res = await fetch('/api/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Settings saved! 💗✨', 'success');
+        } else {
+          showToast(data.error || 'Save failed', 'error');
+        }
+      } catch (e) {
+        showToast('Network error. Try again.', 'error');
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.classList.remove('loading');
+        saveBtn.innerHTML = original;
+      }
+    });
+  </script>
+</body>
+</html>
