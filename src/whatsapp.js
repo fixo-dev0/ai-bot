@@ -4,7 +4,6 @@ const {
   DisconnectReason,
   fetchLatestBaileysVersion
 } = require('fixo-baileys');
-const { Boom } = require('@hapi/boom');
 const P = require('pino');
 const fs = require('fs');
 const path = require('path');
@@ -13,7 +12,7 @@ const { handleStatusUpdate, handleStatusMessage } = require('./statusHandler');
 
 let sock = null;
 let isConnected = false;
-let isSocketReady = false;
+let isSocketReady = false;       // true only after QR event
 let currentPairingCode = null;
 let pairingNumber = null;
 let lastError = null;
@@ -21,7 +20,7 @@ let lastError = null;
 const AUTH_FOLDER = 'auth_info_baileys';
 
 // ============================================================
-// SOCKET CONNECTION
+// CONNECT
 // ============================================================
 async function connectToWhatsApp() {
   const { state, saveCreds } = await useMultiFileAuthState(AUTH_FOLDER);
@@ -35,7 +34,7 @@ async function connectToWhatsApp() {
     auth: state,
     logger: P({ level: 'silent' }),
     printQRInTerminal: false,
-    browser: ['AI Companion Bot', 'Chrome', '1.0.0'],
+    browser: ['Chrome (Linux)', 'Chrome', '120.0.0'],
     generateHighQualityLinkPreview: true,
     syncFullHistory: false,
     markOnlineOnConnect: true,
@@ -47,10 +46,25 @@ async function connectToWhatsApp() {
   sock.ev.on('creds.update', saveCreds);
 
   sock.ev.on('connection.update', async (update) => {
-    const { connection, lastDisconnect } = update;
+    const { connection, lastDisconnect, qr, isNewLogin } = update;
+
+    // ✅ THE FIX: socket is truly ready when QR arrives
+    if (qr) {
+      console.log('📱 QR event received → socket is READY for pairing');
+      isSocketReady = true;
+    }
 
     if (connection === 'connecting') {
       console.log('🔄 Socket connecting...');
+    }
+
+    if (connection === 'open') {
+      isConnected = true;
+      isSocketReady = true;
+      currentPairingCode = null;
+      pairingNumber = null;
+      lastError = null;
+      console.log('✅ WhatsApp Bot Connected!');
     }
 
     if (connection === 'close') {
@@ -58,19 +72,8 @@ async function connectToWhatsApp() {
       isSocketReady = false;
       const statusCode = (lastDisconnect?.error)?.output?.statusCode;
       const shouldReconnect = statusCode !== DisconnectReason.loggedOut;
-
       console.log('❌ Connection closed. Status:', statusCode, '| Reconnect:', shouldReconnect);
-
-      if (shouldReconnect) {
-        setTimeout(() => connectToWhatsApp(), 5000);
-      }
-    } else if (connection === 'open') {
-      isConnected = true;
-      isSocketReady = true;
-      currentPairingCode = null;
-      pairingNumber = null;
-      lastError = null;
-      console.log('✅ WhatsApp Bot Connected!');
+      if (shouldReconnect) setTimeout(() => connectToWhatsApp(), 5000);
     }
   });
 
@@ -91,28 +94,27 @@ async function connectToWhatsApp() {
     }
   });
 
-  // Give the WebSocket time to establish
-  await new Promise(resolve => setTimeout(resolve, 3000));
-  isSocketReady = true;
-
   return sock;
 }
 
 // ============================================================
-// WAIT FOR SOCKET READY
+// WAIT FOR QR EVENT (the real readiness signal)
 // ============================================================
-async function waitForSocketReady(maxWaitMs = 15000) {
+async function waitForSocketReady(maxWaitMs = 30000) {
+  if (isSocketReady) return;
+  console.log('⏳ Waiting for socket to be ready (QR event)...');
   const start = Date.now();
   while (!isSocketReady && Date.now() - start < maxWaitMs) {
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise(r => setTimeout(r, 300));
   }
   if (!isSocketReady) {
-    throw new Error('WhatsApp socket is not ready yet. Please wait a few seconds and try again.');
+    throw new Error('Socket not ready yet. Wait a few seconds and try again.');
   }
+  console.log('✅ Socket ready after', Date.now() - start, 'ms');
 }
 
 // ============================================================
-// CHECK EXISTING SESSION
+// SESSION HELPERS
 // ============================================================
 function hasExistingSession() {
   try {
@@ -125,9 +127,6 @@ function hasExistingSession() {
   }
 }
 
-// ============================================================
-// CLEAR SESSION
-// ============================================================
 function clearSession() {
   try {
     if (fs.existsSync(AUTH_FOLDER)) {
@@ -136,9 +135,18 @@ function clearSession() {
     }
     return true;
   } catch (e) {
-    console.error('Failed to clear session:', e.message);
+    console.error('Clear session error:', e.message);
     return false;
   }
+}
+
+// ============================================================
+// NORMALIZE NUMBER (critical)
+// ============================================================
+function normalizePhoneNumber(input) {
+  let num = String(input).trim().replace(/\D/g, '');
+  num = num.replace(/^0+/, '');  // remove leading zeros
+  return num;
 }
 
 // ============================================================
@@ -147,87 +155,65 @@ function clearSession() {
 async function requestPairingCode(phoneNumber) {
   lastError = null;
 
-  if (!sock) {
-    throw new Error('WhatsApp socket not initialized. Please wait and try again.');
-  }
+  if (!sock) throw new Error('Socket not initialized. Please wait.');
 
-  if (isConnected) {
-    throw new Error('Bot is already connected to a WhatsApp account. Disconnect first.');
-  }
+  if (isConnected) throw new Error('Bot is already connected.');
 
   if (sock.authState?.creds?.registered || hasExistingSession()) {
-    throw new Error(
-      'This session is already registered. Click "Reset Session" and try again.'
-    );
+    throw new Error('Session already registered. Click "Reset Session" and try again.');
   }
 
+  // ✅ Wait for REAL readiness (QR event)
   await waitForSocketReady();
 
-  const cleaned = String(phoneNumber).replace(/\D/g, '');
-
+  const cleaned = normalizePhoneNumber(phoneNumber);
   if (cleaned.length < 10 || cleaned.length > 15) {
-    throw new Error('Invalid phone number. Include country code without + (e.g., 94771234567)');
+    throw new Error('Invalid number. Use format like 94771234567 (no +, no leading 0).');
   }
 
-  console.log(`🔑 Requesting pairing code for: ${cleaned}`);
+  console.log(`🔑 Requesting pair code for: ${cleaned}`);
 
   try {
-    let code;
+    const code = await sock.requestPairingCode(cleaned);
 
-    if (typeof sock.requestPairingCode === 'function') {
-      code = await sock.requestPairingCode(cleaned);
-    } else if (typeof sock.requestPairingCodeV2 === 'function') {
-      code = await sock.requestPairingCodeV2(cleaned);
-    } else {
-      throw new Error('requestPairingCode method not found on socket. Your baileys fork may not support it.');
-    }
-
-    if (!code) {
-      throw new Error('Pairing code was empty. Try again.');
+    if (!code || typeof code !== 'string') {
+      throw new Error('Empty pairing code returned.');
     }
 
     currentPairingCode = code;
     pairingNumber = cleaned;
-    console.log(`✅ Pairing code generated: ${code}`);
-
+    console.log(`✅ Pairing code: ${code}`);
     return { code, number: cleaned };
   } catch (error) {
     lastError = error.message;
-    console.error('❌ Pairing code error:', error.message);
-    console.error('Full error:', error);
+    console.error('❌ Pair error:', error.message);
+    const msg = String(error.message || '').toLowerCase();
 
-    if (error.message?.includes('rate') || error.message?.includes('429')) {
-      throw new Error('Too many requests. Please wait a few minutes and try again.');
-    }
-    if (error.message?.includes('already') || error.message?.includes('registered')) {
-      throw new Error('This session is already registered. Click "Reset Session" and try again.');
-    }
-    if (error.message?.includes('timeout')) {
-      throw new Error('Connection timeout. Please try again.');
-    }
+    if (msg.includes('rate') || msg.includes('429'))
+      throw new Error('Too many attempts. Wait 5 minutes and try again.');
+    if (msg.includes('already') || msg.includes('registered'))
+      throw new Error('Session already registered. Click "Reset Session".');
+    if (msg.includes('timeout'))
+      throw new Error('Timeout. Try again in a moment.');
 
-    throw new Error(`Failed to generate pairing code: ${error.message}`);
+    throw new Error(`Pair code failed: ${error.message}`);
   }
 }
 
 // ============================================================
-// RESET SESSION
+// RESET
 // ============================================================
 async function resetSession() {
   console.log('🔄 Resetting session...');
   try {
-    if (sock) {
-      try { sock.end(undefined); } catch (e) {}
-      sock = null;
-    }
+    if (sock) { try { sock.end(undefined); } catch (e) {} sock = null; }
     isConnected = false;
     isSocketReady = false;
     currentPairingCode = null;
     pairingNumber = null;
     lastError = null;
     clearSession();
-
-    setTimeout(() => connectToWhatsApp(), 1000);
+    setTimeout(() => connectToWhatsApp(), 1500);
     return true;
   } catch (e) {
     console.error('Reset error:', e.message);
@@ -236,7 +222,7 @@ async function resetSession() {
 }
 
 // ============================================================
-// GET STATUS
+// STATUS
 // ============================================================
 function getStatus() {
   return {
@@ -249,9 +235,7 @@ function getStatus() {
   };
 }
 
-function getSocket() {
-  return sock;
-}
+function getSocket() { return sock; }
 
 module.exports = {
   connectToWhatsApp,
